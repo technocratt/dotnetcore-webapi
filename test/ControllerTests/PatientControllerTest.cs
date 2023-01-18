@@ -39,6 +39,7 @@ public class PatientControllerTest
         result.Should().NotBe(null);
         result.StatusCode.Should().Be(expectedStatus);
         result.Value.Should().Be(expectedOutput);
+        result.Value.As<List<Patient>>().Count().Should().Be(expectedOutput.Count());
     }
 
     [Fact]
