@@ -1,6 +1,5 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using webapi.Models;
 using webapi.Services;
 using webapi.Utils;
@@ -50,7 +49,6 @@ public class PatientController : WebApiBaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await patientService.DeletePatient(id);
-        return Ok(result);
+        return Ok(await patientService.DeletePatient(id));
     }
 }
