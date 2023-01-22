@@ -1,12 +1,16 @@
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using webapi.Models;
 using webapi.Services;
+using webapi.Utils;
 
 namespace webapi.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class PatientController : ControllerBase
+public class PatientController : WebApiBaseController
+
 {
     private readonly IPatientService patientService;
 
@@ -18,8 +22,14 @@ public class PatientController : ControllerBase
     [HttpGet]
     public IActionResult Get()
     {
-        var result = patientService.GetAllPatients();
-        return Ok(result);
+        return Ok(patientService.GetAllPatients());
+    }
+
+    [HttpGet("{id}")]
+    [ETagFilter]
+    public IActionResult GetById(int id)
+    {
+        return Ok(patientService.GetPatientById(id));
     }
 
     [HttpPost]
@@ -27,5 +37,20 @@ public class PatientController : ControllerBase
     {
         var result = await patientService.CreatePatient(patient);
         return Created(nameof(Post), patient);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Put(int id, Patient patient)
+    {
+        return IsValidUpdate(patientService.GetPatientById(id)) ?
+                Ok(await patientService.ModifyPatient(id, patient))
+                : StatusCode((int)HttpStatusCode.PreconditionFailed);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var result = await patientService.DeletePatient(id);
+        return Ok(result);
     }
 }
