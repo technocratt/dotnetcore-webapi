@@ -30,6 +30,8 @@ public class PatientControllerTest
         _patientService = new Mock<IPatientService>();
 
         _controller = new PatientController(_patientService.Object);
+        _controller.ControllerContext = new ControllerContext();
+        _controller.ControllerContext.HttpContext = new DefaultHttpContext();
     }
 
     [Fact]
@@ -59,7 +61,7 @@ public class PatientControllerTest
         var patientId = expectedResult.Id;
 
         //// Arrange
-        _patientService.Setup(_ => _.GetPatientById(patientId)).Returns(expectedResult);
+        _patientService.Setup(_ => _.GetPatientById(It.IsAny<int>())).Returns(expectedResult);
 
         //// Act
         var result = (ObjectResult)_controller.GetById(patientId);
@@ -78,7 +80,7 @@ public class PatientControllerTest
         var patientToCreate = _mockPatient.Generate();
 
         //// Arrange
-        _patientService.Setup(_ => _.CreatePatient(patientToCreate)).ReturnsAsync(expectedResult);
+        _patientService.Setup(_ => _.CreatePatient(It.IsAny<Patient>())).ReturnsAsync(expectedResult);
 
         //// Act
         var result = (ObjectResult)await _controller.Post(patientToCreate);
@@ -98,13 +100,12 @@ public class PatientControllerTest
         var patientId = patientToModify.Id;
 
         //// Arrange
-        _patientService.Setup(_ => _.GetPatientById(patientId)).Returns(patientToModify);
-        _patientService.Setup(_ => _.ModifyPatient(patientId, patientToModify)).ReturnsAsync(expectedResult);
-        _controller.ControllerContext = new ControllerContext();
-        _controller.ControllerContext.HttpContext = new DefaultHttpContext();
+        _patientService.Setup(_ => _.GetPatientById(It.IsAny<int>())).Returns(patientToModify);
+        _patientService.Setup(_ => _.ModifyPatient(It.IsAny<int>(), It.IsAny<Patient>())).ReturnsAsync(expectedResult);
+        _controller.ControllerContext.HttpContext.Request.Headers.Add(HeaderNames.IfMatch, patientToModify.ToETag());
 
         //// Act
-        var result = (ObjectResult)await _controller.Put(patientToModify.Id, patientToModify);
+        var result = (ObjectResult)await _controller.Put(patientId, patientToModify);
 
         //// Assert
         result.Should().NotBe(null);
@@ -121,14 +122,12 @@ public class PatientControllerTest
         var patientId = patientToModify.Id;
 
         //// Arrange
-        _patientService.Setup(_ => _.GetPatientById(patientId)).Returns(patientToModify);
-        _patientService.Setup(_ => _.ModifyPatient(patientId, patientToModify)).ReturnsAsync(expectedResult);
-        _controller.ControllerContext = new ControllerContext();
-        _controller.ControllerContext.HttpContext = new DefaultHttpContext();
+        _patientService.Setup(_ => _.GetPatientById(It.IsAny<int>())).Returns(patientToModify);
+        _patientService.Setup(_ => _.ModifyPatient(It.IsAny<int>(), It.IsAny<Patient>())).ReturnsAsync(expectedResult);
         _controller.ControllerContext.HttpContext.Request.Headers.Add(HeaderNames.IfMatch, patientToModify.ToETag() + 1);
 
         //// Act
-        var result = (StatusCodeResult)await _controller.Put(patientToModify.Id, patientToModify);
+        var result = (StatusCodeResult)await _controller.Put(patientId, patientToModify);
 
         //// Assert
         result.Should().NotBe(null);
@@ -144,7 +143,7 @@ public class PatientControllerTest
         var patientId = patientToDelete.Id;
 
         //// Arrange
-        _patientService.Setup(_ => _.DeletePatient(patientId)).ReturnsAsync(expectedResult);
+        _patientService.Setup(_ => _.DeletePatient(It.IsAny<int>())).ReturnsAsync(expectedResult);
 
         //// Act
         var result = (ObjectResult)await _controller.Delete(patientId);

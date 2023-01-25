@@ -1,3 +1,10 @@
+### About
+This is a simple web api boilerplate code based on dotnetcore, features below:
+1. Crud endpoints + swagger
+2. Flat file data store for persistence
+3. Xunit test cases with moq and Bogus
+4. ETag checks to determine collisions during update
+
 ### Create projects
 ```sh
 dotnet new sln healthify
@@ -22,6 +29,7 @@ dotnet add package Bogus
 ```sh
 cd webapi
 dotnet add package JsonFlatFileDataStore
+dotnet add package Newtonsoft.Json
 ```
 
 ### Run tests
