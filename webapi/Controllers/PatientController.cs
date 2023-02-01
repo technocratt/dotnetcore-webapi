@@ -7,9 +7,9 @@ using webapi.Utils;
 namespace webapi.Controllers;
 
 [ApiController]
+[ApiAuth]
 [Route("[controller]")]
 public class PatientController : WebApiBaseController
-
 {
     private readonly IPatientService patientService;
 
