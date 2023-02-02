@@ -1,13 +1,15 @@
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using webapi.Models;
+using webapi.Security;
 using webapi.Services;
 using webapi.Utils;
 
 namespace webapi.Controllers;
 
 [ApiController]
-[ApiAuth]
+[Authorize]
 [Route("[controller]")]
 public class PatientController : WebApiBaseController
 {
@@ -18,6 +20,7 @@ public class PatientController : WebApiBaseController
         patientService = ps;
     }
 
+    [ApiReadAuthorization]
     [HttpGet]
     public IActionResult Get()
     {
